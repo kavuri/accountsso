@@ -6,6 +6,7 @@
 #include <Accounts/Account>
 #include <Accounts/Service>
 #include <Accounts/Manager>
+#include <Accounts/AccountService>
 #include <SessionData>
 #include <IdentityInfo>
 #include <Identity>
@@ -25,6 +26,9 @@ public:
     void getCredentials();
     void query();
     void listAccounts();
+    void addSetting(const QString key, const QString value);
+    void addSetting(Accounts::AccountId id, const QString key, const QString value);
+    void settings(Accounts::AccountId id);
     
 public slots:
     void accountCreated(Accounts::AccountId id);

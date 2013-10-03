@@ -49,12 +49,36 @@ AccountHelper::query ()
 void
 AccountHelper::createAccount ()
 {
-    mAcc = mMgr->createAccount("email");
-    mAcc->setDisplayName("my email account");
+    mAcc = mMgr->createAccount("syncml");
+    mAcc->setDisplayName("memotoo.com");
     mAcc->setEnabled(true);
-    Service ser = mMgr->service("email");
+    Service ser = mMgr->service("syncml");
+    Accounts::AccountService* accServ = new Accounts::AccountService(mAcc, ser);
+    accServ->setValue("remote_service_name", "memotoo.com");
     mAcc->selectService(ser);
     mAcc->syncAndBlock();
+}
+
+void
+AccountHelper::addSetting(const QString key, const QString value)
+{
+    Accounts::Service ser = mAcc->selectedService();
+    Accounts::AccountService* accServ = new Accounts::AccountService(mAcc, ser);
+    accServ->setValue(key, QVariant(value));
+    mAcc->syncAndBlock();
+    delete accServ;
+}
+
+void
+AccountHelper::addSetting(Accounts::AccountId id, const QString key, const QString value)
+{
+    Accounts::Account *acc = mMgr->account(id);
+    //Accounts::Service ser = acc->selectedService();
+    //Accounts::AccountService* accServ = new Accounts::AccountService(acc, ser);
+    //accServ->setValue(key, QVariant(value));
+    acc->setValue(key, value);
+    acc->syncAndBlock();
+    //delete accServ;
 }
 
 void
@@ -110,10 +134,10 @@ AccountHelper::createCredentials ()
     QMap<MethodName, MechanismsList> methods;
     QStringList mechs = QStringList() << QString::fromLatin1 ("password");
     methods.insert (QLatin1String("password"), mechs);
-    mIdentityInfo = new IdentityInfo(QLatin1String("jolla"),
-                                     QLatin1String("secret"),
+    mIdentityInfo = new IdentityInfo(QLatin1String("sailfishusername"),
+                                     QLatin1String("sailfish"),
                                      methods);
-    mIdentityInfo->setSecret(QLatin1String("sfsddfd"));
+    mIdentityInfo->setSecret(QLatin1String("abc123"));
     mIdentityInfo->setType(IdentityInfo::Application);
     mIdentity = Identity::newIdentity(*mIdentityInfo);
     
@@ -151,4 +175,19 @@ AccountHelper::listAccounts ()
     foreach (AccountId id, accList) {
         qDebug() << id;
     }
+}
+
+void
+AccountHelper::settings(Accounts::AccountId id)
+{
+    Accounts::Account *acc = mMgr->account(id);
+    if (acc)
+    {
+        QStringList allKeys = acc->allKeys();
+        foreach(const QString key, allKeys)
+        {
+            qDebug() << key << acc->valueAsString(key);
+        }
+    } else
+        qDebug() << "No account with id " << id << " exists";
 }
