@@ -8,7 +8,7 @@ QT       += core
 
 QT       -= gui
 
-TARGET = Tester
+TARGET = assoclient
 CONFIG   += console link_pkgconfig plugin
 CONFIG   -= app_bundle
 
